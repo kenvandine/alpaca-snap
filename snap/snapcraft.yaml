@@ -1,0 +1,83 @@
+name: alpaca-kenvandine
+base: core24
+adopt-info: alpaca
+
+platforms:
+  amd64:
+  arm64:
+
+confinement: strict
+grade: stable
+compression: lzo
+
+slots:
+  dbus-alpaca:
+    interface: dbus
+    bus: session
+    name: com.jeffser.Alpaca
+
+apps:
+  alpaca:
+    command: usr/bin/alpaca
+    common-id: com.jeffser.Alpaca
+    extensions:
+      - gnome
+    plugs:
+      - network
+      - network-bind
+      - home
+      - removable-media
+
+parts:
+  # Python dependencies
+  python-deps:
+    plugin: python
+    source: .
+    python-packages:
+      - requests==2.31.0
+      - pillow==10.3.0
+      - pypdf==4.2.0
+      - youtube-transcript-api==0.6.2
+      - html2text==2024.2.26
+      - pydbus==0.6.0
+      - odfpy==1.4.1
+      - pyicu==2.14
+      - matplotlib==3.10.0
+      - openai==1.61.1
+
+  # Alpaca app
+  alpaca:
+    plugin: meson
+    source-type: git
+    source: https://github.com/Jeffser/Alpaca.git
+    source-depth: 1
+    meson-parameters:
+      - --prefix=/usr
+      - -Ddatadir=/snap/alpaca-kenvandine/current/usr/share
+    override-pull: |
+      craftctl default
+      sed -i 's#Jeffser/Alpaca/wiki#kenvandine/alpaca-snap/wiki#g' $CRAFT_PART_SRC/src/window.ui
+    override-build: |
+      craftctl default
+      sed -i '1c#!/usr/bin/env python3' $CRAFT_PART_INSTALL/usr/bin/alpaca
+    parse-info:
+      - usr/share/metainfo/com.jeffser.Alpaca.metainfo.xml
+    organize:
+      snap/alpaca-kenvandine/current: .
+    after: [python-deps]
+
+  deps:
+    plugin: nil
+    after: [alpaca]
+    stage-packages:
+      - libnuma1
+      - libspelling-1-1
+      - gir1.2-vte-3.91
+      - gir1.2-spelling-1
+      - libvte-2.91-gtk4-0
+    prime:
+      - usr/lib/*/libnuma.so.*
+      - usr/lib/*/libspell*.so.*
+      - usr/lib/*/libvte*.so.*
+      - usr/lib/*/girepository-1.0/Vte*
+      - usr/lib/*/girepository-1.0/Spell*
