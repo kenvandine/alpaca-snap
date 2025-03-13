@@ -10,6 +10,10 @@ confinement: strict
 grade: stable
 compression: lzo
 
+contact: https://github.com/kenvandine/alpaca-snap/issues
+issues: https://github.com/kenvandine/alpaca-snap/issues
+website: https://github.com/kenvandine/alpaca-snap
+
 slots:
   dbus-alpaca:
     interface: dbus
