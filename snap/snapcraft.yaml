@@ -27,6 +27,8 @@ apps:
       - network-bind
       - home
       - removable-media
+    environment:
+      PYTHONPATH: ${SNAP}/lib/python3.12/site-packages${PYTHON_PATH:+:$PYTHON_PATH}
 
 parts:
   # Python dependencies
@@ -44,6 +46,8 @@ parts:
       - pyicu==2.14
       - matplotlib==3.10.0
       - openai==1.61.1
+    prime:
+      - -pyvenv.cfg
 
   # Alpaca app
   alpaca:
@@ -57,6 +61,7 @@ parts:
     override-pull: |
       craftctl default
       sed -i 's#Jeffser/Alpaca/wiki#kenvandine/alpaca-snap/wiki#g' $CRAFT_PART_SRC/src/window.ui
+      patch -p1 < $CRAFT_PROJECT_DIR/snap/local/appinfo.patch
     override-build: |
       craftctl default
       sed -i '1c#!/usr/bin/env python3' $CRAFT_PART_INSTALL/usr/bin/alpaca
