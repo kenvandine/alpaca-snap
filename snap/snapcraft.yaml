@@ -106,6 +106,7 @@ parts:
       craftctl default
       sed -i 's#Jeffser/Alpaca/wiki#kenvandine/alpaca-snap/wiki#g' $CRAFT_PART_SRC/src/window.ui
       patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_disable_whisper.patch
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_only_ollama.patch
     override-build: |
       craftctl default
       sed -i '1c#!/usr/bin/env python3' $CRAFT_PART_INSTALL/usr/bin/alpaca

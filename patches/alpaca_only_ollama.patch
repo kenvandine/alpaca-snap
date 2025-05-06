@@ -1,0 +1,31 @@
+diff --git a/src/instance_manager.py b/src/instance_manager.py
+index 2e2b5bd..35d2b6c 100644
+--- a/src/instance_manager.py
++++ b/src/instance_manager.py
+@@ -364,7 +364,7 @@ class base_instance:
+         def save():
+             save_functions = {
+                 'name': lambda val: setattr(self, 'name', val if val else _('Instance')),
+-                'port': lambda val: setattr(self, 'instance_url', 'http://0.0.0.0:{}'.format(int(val))),
++                'port': lambda val: setattr(self, 'instance_url', 'http://127.0.0.1:{}'.format(int(val))),
+                 'url': lambda val: setattr(self, 'instance_url', '{}{}'.format('http://' if not re.match(r'^(http|https)://', val) else '', val.rstrip('/'))),
+                 'api': lambda val: setattr(self, 'api_key', self.api_key if self.api_key and not val else (val if val else 'empty')),
+                 'max_tokens': lambda val: setattr(self, 'max_tokens', val if val else -1),
+@@ -635,7 +635,7 @@ class ollama_managed(base_ollama):
+ class ollama(base_ollama):
+     instance_type = 'ollama'
+     instance_type_display = 'Ollama'
+-    instance_url = 'http://0.0.0.0:11434'
++    instance_url = 'http://127.0.0.1:11434'
+     description = _('Local or remote AI instance not managed by Alpaca')
+ 
+     def __init__(self, data:dict={}):
+@@ -933,6 +933,7 @@ def update_instance_list():
+         window.instance_listbox.set_selection_mode(1)
+         window.instance_listbox.select_row(row)
+ 
+-ready_instances = [ollama_managed, ollama, chatgpt, gemini, together, venice, deepseek, openrouter, anthropic, groq, fireworks, lambda_labs, cerebras, klusterai, generic_openai]
++#ready_instances = [ollama_managed, ollama, chatgpt, gemini, together, venice, deepseek, openrouter, anthropic, groq, fireworks, lambda_labs, cerebras, klusterai, generic_openai]
++ready_instances = [ollama]
+ 
+ 
