@@ -85,6 +85,12 @@ parts:
     prime:
       - usr/lib/*/*.so*
       - usr/lib/*/girepository-1.0/*
+    override-pull: |
+      craftctl default
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/accent-color-Return-return-orange-as-default-color.patch
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/style-manager-Support-Yaru-accent-colors.patch
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/accent-color-Always-expose-and-use-yaru-accent-colors-val.patch
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/style-Add-wartybrown-accent-support.patch
 
   # Alpaca app
   alpaca:
