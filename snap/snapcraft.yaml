@@ -14,14 +14,6 @@ contact: https://github.com/kenvandine/alpaca-snap/issues
 issues: https://github.com/kenvandine/alpaca-snap/issues
 website: https://github.com/kenvandine/alpaca-snap
 
-layout:
-  /usr/lib/$CRAFT_ARCH_TRIPLET/alsa-lib:
-    bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/alsa-lib
-  /etc/asound.conf:
-    bind-file: $SNAP/etc/asound.conf
-  /usr/share/alsa/alsa.conf:
-    bind-file: $SNAP/usr/share/alsa/alsa.conf
-
 slots:
   dbus-alpaca:
     interface: dbus
@@ -35,7 +27,6 @@ apps:
     extensions:
       - gnome
     plugs:
-      - alsa
       - network
       - home
       - removable-media
@@ -44,55 +35,6 @@ apps:
       HOME: $SNAP_USER_COMMON
 
 parts:
-  alsa:
-    plugin: nil
-    source: https://github.com/diddledan/snapcraft-alsa.git
-    override-pull: |
-      cat > asound.conf <<EOF
-      pcm.!default {
-        type pulse
-        fallback "sysdefault"
-        hint {
-          show on
-          description "Default ALSA Output (currently PulseAudio Sound Server)"
-        }
-      }
-      ctl.!default {
-        type pulse
-        fallback "sysdefault"
-      }
-      EOF
-    override-build: |
-      install -m644 -D -t $CRAFT_PART_INSTALL/etc asound.conf
-    build-packages:
-      - libasound2-dev
-    stage-packages:
-      - libasound2
-      - libasound2-plugins
-    stage:
-      - usr/lib/*/libasound*
-      - usr/lib/*/libOpenCL.so.*
-      - usr/lib/*/libSvtAv1Enc.so.*
-      - usr/lib/*/libavcodec.so.*
-      - usr/lib/*/libavutil.so.*
-      - usr/lib/*/libcodec2.so.*
-      - usr/lib/*/libgsm.so.*
-      - usr/lib/*/libhwy.so.*
-      - usr/lib/*/libjxl*
-      - usr/lib/*/librav1e.so.*
-      - usr/lib/*/libshine.so.*
-      - usr/lib/*/libsnappy.so.*
-      - usr/lib/*/libsoxr.so.*
-      - usr/lib/*/libswresample.so.*
-      - usr/lib/*/libvpl.so.*
-      - usr/lib/*/libx264.so.*
-      - usr/lib/*/libxvidcore.so.*
-      - usr/lib/*/libzvbi.so.*
-      - usr/lib/*/alsa-lib
-      - etc/asound.conf
-      - etc/alsa
-      - usr/share/alsa/alsa.conf
-
   # Python dependencies
   python-deps:
     plugin: python
@@ -108,7 +50,6 @@ parts:
       - matplotlib==3.10.0
       - openai==1.61.1
       - markitdown==0.1.1
-      - openai-whisper==20240930
       - pyaudio==0.2.14
     build-packages:
       - portaudio19-dev
@@ -164,6 +105,7 @@ parts:
     override-pull: |
       craftctl default
       sed -i 's#Jeffser/Alpaca/wiki#kenvandine/alpaca-snap/wiki#g' $CRAFT_PART_SRC/src/window.ui
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_disable_whisper.patch
     override-build: |
       craftctl default
       sed -i '1c#!/usr/bin/env python3' $CRAFT_PART_INSTALL/usr/bin/alpaca
