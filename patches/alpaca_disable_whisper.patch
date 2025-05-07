@@ -1,0 +1,54 @@
+diff --git a/src/window.py b/src/window.py
+index f8fd1e4..34a1d95 100644
+--- a/src/window.py
++++ b/src/window.py
+@@ -58,6 +58,12 @@ from .constants import AlpacaFolders, Platforms, SPEACH_RECOGNITION_LANGUAGES, T
+ from .custom_widgets import message_widget, chat_widget, terminal_widget, dialog_widget, model_manager_widget
+ from .internal import config_dir, data_dir, cache_dir, source_dir, IN_FLATPAK
+ 
++try:
++    import whisper
++except ImportError:
++    whisper = None
++
++
+ logger = logging.getLogger(__name__)
+ 
+ @Gtk.Template(resource_path='/com/jeffser/Alpaca/window.ui')
+@@ -130,6 +136,7 @@ class AlpacaWindow(Adw.ApplicationWindow):
+     mic_language_combo = Gtk.Template.Child()
+     mic_model_combo = Gtk.Template.Child()
+     tts_voice_combo = Gtk.Template.Child()
++    microphone_stack = Gtk.Template.Child()
+ 
+     banner = Gtk.Template.Child()
+ 
+@@ -170,6 +177,7 @@ class AlpacaWindow(Adw.ApplicationWindow):
+ 
+     @Gtk.Template.Callback()
+     def microphone_toggled(self, button):
++        print(f"microphone_toggled")
+         language=self.sql_instance.get_preference('mic_language')
+         text_view = list(button.get_parent().get_parent())[0].get_child()
+         buffer = text_view.get_buffer()
+@@ -1500,3 +1508,7 @@ class AlpacaWindow(Adw.ApplicationWindow):
+             self.prepare_alpaca()
+         else:
+             self.main_navigation_view.replace_with_tags(['welcome'])
++
++        # Hide the microphone stack if whisper isn't installed
++        if not whisper:
++            self.microphone_stack.set_visible(False)
+diff --git a/src/window.ui b/src/window.ui
+index 9e77184..9fc2729 100644
+--- a/src/window.ui
++++ b/src/window.ui
+@@ -358,7 +358,7 @@ Alpaca is distributed under GPL v3.0, this software comes with no warranty.</pro
+                                               </object>
+                                             </child>
+                                             <child>
+-                                              <object class="GtkStack">
++                                              <object class="GtkStack" id="microphone_stack">
+                                                 <child>
+                                                   <object class="GtkStackPage">
+                                                     <property name="name">button</property>

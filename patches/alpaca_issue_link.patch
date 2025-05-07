@@ -1,0 +1,13 @@
+diff --git a/src/main.py b/src/main.py
+index b29fc6d..e5aaf39 100644
+--- a/src/main.py
++++ b/src/main.py
+@@ -185,7 +185,7 @@ class AlpacaApplication(Adw.Application):
+                       f'© {current_year} Lambda.ai\n'
+                       f'© {current_year} Fireworks.ai\n'
+                       f'© {current_year} Microsoft',
+-            issue_url='https://github.com/Jeffser/Alpaca/issues',
++            issue_url='https://github.com/kenvandine/alpaca-snap/issues',
+             license_type=Gtk.License.GPL_3_0,
+             website="https://jeffser.com/alpaca"
+         )
