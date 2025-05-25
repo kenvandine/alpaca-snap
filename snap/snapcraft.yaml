@@ -33,6 +33,7 @@ apps:
     environment:
       PYTHONPATH: ${SNAP}/lib/python3.12/site-packages${PYTHON_PATH:+:$PYTHON_PATH}
       HOME: $SNAP_USER_COMMON
+      ALPACA_OLLAMA_ONLY: 1
 
 parts:
   # Python dependencies
