@@ -28,11 +28,12 @@ apps:
       - gnome
     plugs:
       - network
-      - network-bind
       - home
       - removable-media
     environment:
       PYTHONPATH: ${SNAP}/lib/python3.12/site-packages${PYTHON_PATH:+:$PYTHON_PATH}
+      HOME: $SNAP_USER_COMMON
+      ALPACA_OLLAMA_ONLY: 1
 
 parts:
   # Python dependencies
@@ -42,7 +43,6 @@ parts:
     python-packages:
       - requests==2.31.0
       - pillow==10.3.0
-      - pypdf==4.2.0
       - youtube-transcript-api==0.6.2
       - html2text==2024.2.26
       - pydbus==0.6.0
@@ -50,22 +50,66 @@ parts:
       - pyicu==2.14
       - matplotlib==3.10.0
       - openai==1.61.1
+      - markitdown==0.1.1
+      - pyaudio==0.2.14
+    build-packages:
+      - portaudio19-dev
     prime:
       - -pyvenv.cfg
 
+  libadwaita:
+    source: https://gitlab.gnome.org/GNOME/libadwaita.git
+    source-tag: '1.7.2'
+    source-depth: 1
+    plugin: meson
+    meson-parameters:
+      - --prefix=/usr
+      - -Doptimization=3
+      - -Ddebug=false
+      - -Dintrospection=enabled
+      - -Dvapi=false
+      - -Dgtk_doc=false
+      - -Dtests=false
+      - -Dexamples=false
+    build-packages:
+      - bison
+      - flex
+      - sassc
+      - libyaml-dev
+      - libzstd-dev
+      - libsystemd-dev
+      - gperf
+      - libappstream-dev
+    build-environment:
+      - CFLAGS: "-Wno-redundant-decls -Wno-error=format-nonliteral"
+    prime:
+      - usr/lib/*/*.so*
+      - usr/lib/*/girepository-1.0/*
+    override-pull: |
+      craftctl default
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/accent-color-Return-return-orange-as-default-color.patch
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/style-manager-Support-Yaru-accent-colors.patch
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/accent-color-Always-expose-and-use-yaru-accent-colors-val.patch
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/style-Add-wartybrown-accent-support.patch
+
   # Alpaca app
   alpaca:
+    after: [libadwaita, python-deps]
     plugin: meson
     source-type: git
     source: https://github.com/Jeffser/Alpaca.git
     source-depth: 1
+    source-tag: 6.0.5
     meson-parameters:
       - --prefix=/usr
       - -Ddatadir=/snap/alpaca-kenvandine/current/usr/share
     override-pull: |
       craftctl default
       sed -i 's#Jeffser/Alpaca/wiki#kenvandine/alpaca-snap/wiki#g' $CRAFT_PART_SRC/src/window.ui
-      patch -p1 < $CRAFT_PROJECT_DIR/snap/local/appinfo.patch
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_disable_whisper.patch
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_only_ollama.patch
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_no_notice.patch
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_issue_link.patch
     override-build: |
       craftctl default
       sed -i '1c#!/usr/bin/env python3' $CRAFT_PART_INSTALL/usr/bin/alpaca
@@ -73,7 +117,6 @@ parts:
       - usr/share/metainfo/com.jeffser.Alpaca.metainfo.xml
     organize:
       snap/alpaca-kenvandine/current: .
-    after: [python-deps]
 
   deps:
     plugin: nil
@@ -84,9 +127,15 @@ parts:
       - gir1.2-vte-3.91
       - gir1.2-spelling-1
       - libvte-2.91-gtk4-0
+      - libportaudio2
+      - libjack-jackd2-0
+      - libsamplerate0
     prime:
       - usr/lib/*/libnuma.so.*
       - usr/lib/*/libspell*.so.*
       - usr/lib/*/libvte*.so.*
       - usr/lib/*/girepository-1.0/Vte*
       - usr/lib/*/girepository-1.0/Spell*
+      - usr/lib/*/libjack*.so.*
+      - usr/lib/*/libportaudio*.so.*
+      - usr/lib/*/libsamplerate*.so.*
