@@ -22,7 +22,7 @@ slots:
 
 apps:
   alpaca:
-    command: usr/bin/alpaca
+    command: usr/bin/snap_launcher.sh
     common-id: com.jeffser.Alpaca
     extensions:
       - gnome
@@ -36,6 +36,11 @@ apps:
       ALPACA_OLLAMA_ONLY: 1
 
 parts:
+  launcher:
+    plugin: dump
+    source: ./snap/local
+    organize:
+      snap_launcher.sh: usr/bin/snap_launcher.sh
   # Python dependencies
   python-deps:
     plugin: python

@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+
+snapctl set ollama-only=0
