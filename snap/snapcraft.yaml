@@ -104,7 +104,7 @@ parts:
     source-type: git
     source: https://github.com/Jeffser/Alpaca.git
     source-depth: 1
-    source-tag: 6.0.5
+    source-tag: 6.1.5
     meson-parameters:
       - --prefix=/usr
       - -Ddatadir=/snap/alpaca-kenvandine/current/usr/share
@@ -112,9 +112,9 @@ parts:
       craftctl default
       sed -i 's#Jeffser/Alpaca/wiki#kenvandine/alpaca-snap/wiki#g' $CRAFT_PART_SRC/src/window.ui
       patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_disable_whisper.patch
-      patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_only_ollama.patch
       patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_no_notice.patch
       patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_issue_link.patch
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_stt_models.patch
     override-build: |
       craftctl default
       sed -i '1c#!/usr/bin/env python3' $CRAFT_PART_INSTALL/usr/bin/alpaca
