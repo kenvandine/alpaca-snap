@@ -48,14 +48,14 @@ parts:
     python-packages:
       - requests==2.31.0
       - pillow==10.3.0
-      - youtube-transcript-api==0.6.2
+      - youtube-transcript-api[all]==1.0.0
       - html2text==2024.2.26
       - pydbus==0.6.0
       - odfpy==1.4.1
       - pyicu==2.14
       - matplotlib==3.10.0
       - openai==1.61.1
-      - markitdown==0.1.1
+      - markitdown[all]==0.1.1
       - pyaudio==0.2.14
     build-packages:
       - portaudio19-dev
