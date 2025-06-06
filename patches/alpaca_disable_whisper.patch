@@ -1,10 +1,10 @@
 diff --git a/src/window.py b/src/window.py
-index f8fd1e4..34a1d95 100644
+index cd92f49..475f6d9 100644
 --- a/src/window.py
 +++ b/src/window.py
-@@ -58,6 +58,12 @@ from .constants import AlpacaFolders, Platforms, SPEACH_RECOGNITION_LANGUAGES, T
- from .custom_widgets import message_widget, chat_widget, terminal_widget, dialog_widget, model_manager_widget
- from .internal import config_dir, data_dir, cache_dir, source_dir, IN_FLATPAK
+@@ -49,6 +49,12 @@ from .sql_manager import generate_uuid, generate_numbered_name, Instance as SQL
+ from . import widgets as Widgets
+ from .constants import SPEACH_RECOGNITION_LANGUAGES, TTS_VOICES, TTS_AUTO_MODES, STT_MODELS, data_dir, source_dir, cache_dir
  
 +try:
 +    import whisper
@@ -15,40 +15,61 @@ index f8fd1e4..34a1d95 100644
  logger = logging.getLogger(__name__)
  
  @Gtk.Template(resource_path='/com/jeffser/Alpaca/window.ui')
-@@ -130,6 +136,7 @@ class AlpacaWindow(Adw.ApplicationWindow):
+@@ -111,9 +117,11 @@ class AlpacaWindow(Adw.ApplicationWindow):
+ 
+     background_switch = Gtk.Template.Child()
+     powersaver_warning_switch = Gtk.Template.Child()
++    mic_group = Gtk.Template.Child()
+     mic_auto_send_switch = Gtk.Template.Child()
      mic_language_combo = Gtk.Template.Child()
      mic_model_combo = Gtk.Template.Child()
++    tts_group = Gtk.Template.Child()
      tts_voice_combo = Gtk.Template.Child()
-+    microphone_stack = Gtk.Template.Child()
+     tts_auto_mode_combo = Gtk.Template.Child()
  
-     banner = Gtk.Template.Child()
+@@ -958,6 +966,11 @@ class AlpacaWindow(Adw.ApplicationWindow):
+                 selected_index = i
+             string_list.append('{} ({})'.format(model.title(), size))
  
-@@ -170,6 +177,7 @@ class AlpacaWindow(Adw.ApplicationWindow):
- 
-     @Gtk.Template.Callback()
-     def microphone_toggled(self, button):
-+        print(f"microphone_toggled")
-         language=self.sql_instance.get_preference('mic_language')
-         text_view = list(button.get_parent().get_parent())[0].get_child()
-         buffer = text_view.get_buffer()
-@@ -1500,3 +1508,7 @@ class AlpacaWindow(Adw.ApplicationWindow):
-             self.prepare_alpaca()
-         else:
-             self.main_navigation_view.replace_with_tags(['welcome'])
-+
-+        # Hide the microphone stack if whisper isn't installed
++        # Only display speech section if whisper is available
 +        if not whisper:
-+            self.microphone_stack.set_visible(False)
++            self.mic_group.set_visible(False)
++            self.tts_group.set_visible(False)
++
+         self.mic_model_combo.set_model(string_list)
+         self.mic_model_combo.set_selected(selected_index)
+         self.mic_model_combo.set_sensitive(True)
+@@ -1211,7 +1224,10 @@ class AlpacaWindow(Adw.ApplicationWindow):
+         enter_key_controller = Gtk.EventControllerKey.new()
+         enter_key_controller.connect("key-pressed", enter_key_handler)
+         self.message_text_view.add_controller(enter_key_controller)
+-        self.message_text_view_scrolled_window.get_parent().append(Widgets.speech_recognition.MicrophoneButton(self.message_text_view))
++
++        # Only display microphone button if whisper is available
++        if whisper:
++            self.message_text_view_scrolled_window.get_parent().append(Widgets.speech_recognition.MicrophoneButton(self.message_text_view))
+ 
+         for name, data in {
+             'send': {
 diff --git a/src/window.ui b/src/window.ui
-index 9e77184..9fc2729 100644
+index 0127936..e969e41 100644
 --- a/src/window.ui
 +++ b/src/window.ui
-@@ -358,7 +358,7 @@ Alpaca is distributed under GPL v3.0, this software comes with no warranty.</pro
-                                               </object>
-                                             </child>
-                                             <child>
--                                              <object class="GtkStack">
-+                                              <object class="GtkStack" id="microphone_stack">
-                                                 <child>
-                                                   <object class="GtkStackPage">
-                                                     <property name="name">button</property>
+@@ -1077,7 +1077,7 @@ Alpaca is distributed under GPL v3.0, this software comes with no warranty.</pro
+             </object>
+           </child>
+           <child>
+-            <object class="AdwPreferencesGroup">
++            <object class="AdwPreferencesGroup" id="mic_group">
+               <child>
+                 <object class="AdwComboRow" id="mic_model_combo">
+                   <signal name="notify::selected" handler="selected_mic_model"/>
+@@ -1103,7 +1103,7 @@ Alpaca is distributed under GPL v3.0, this software comes with no warranty.</pro
+             </object>
+           </child>
+           <child>
+-            <object class="AdwPreferencesGroup">
++            <object class="AdwPreferencesGroup" id="tts_group">
+               <child>
+                 <object class="AdwComboRow" id="tts_voice_combo">
+                   <signal name="notify::selected" handler="selected_tts_voice"/>

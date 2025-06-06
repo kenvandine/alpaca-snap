@@ -22,7 +22,7 @@ slots:
 
 apps:
   alpaca:
-    command: usr/bin/alpaca
+    command: usr/bin/snap_launcher.sh
     common-id: com.jeffser.Alpaca
     extensions:
       - gnome
@@ -36,6 +36,11 @@ apps:
       ALPACA_OLLAMA_ONLY: 1
 
 parts:
+  launcher:
+    plugin: dump
+    source: ./snap/local
+    organize:
+      snap_launcher.sh: usr/bin/snap_launcher.sh
   # Python dependencies
   python-deps:
     plugin: python
@@ -43,14 +48,14 @@ parts:
     python-packages:
       - requests==2.31.0
       - pillow==10.3.0
-      - youtube-transcript-api==0.6.2
+      - youtube-transcript-api[all]==1.0.0
       - html2text==2024.2.26
       - pydbus==0.6.0
       - odfpy==1.4.1
       - pyicu==2.14
       - matplotlib==3.10.0
       - openai==1.61.1
-      - markitdown==0.1.1
+      - markitdown[all]==0.1.1
       - pyaudio==0.2.14
     build-packages:
       - portaudio19-dev
@@ -99,7 +104,7 @@ parts:
     source-type: git
     source: https://github.com/Jeffser/Alpaca.git
     source-depth: 1
-    source-tag: 6.0.5
+    source-tag: 6.1.5
     meson-parameters:
       - --prefix=/usr
       - -Ddatadir=/snap/alpaca-kenvandine/current/usr/share
@@ -107,9 +112,9 @@ parts:
       craftctl default
       sed -i 's#Jeffser/Alpaca/wiki#kenvandine/alpaca-snap/wiki#g' $CRAFT_PART_SRC/src/window.ui
       patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_disable_whisper.patch
-      patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_only_ollama.patch
       patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_no_notice.patch
       patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_issue_link.patch
+      patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_stt_models.patch
     override-build: |
       craftctl default
       sed -i '1c#!/usr/bin/env python3' $CRAFT_PART_INSTALL/usr/bin/alpaca
