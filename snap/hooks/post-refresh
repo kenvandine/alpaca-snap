@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eux
+
+ollama_only=$(snapctl get ollama-only)
+if [ "$ollama_only" = "" ]
+then
+  snapctl set daemon=0
+fi
