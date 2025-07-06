@@ -1,15 +1,15 @@
 diff --git a/src/window.py b/src/window.py
-index cd92f49..17366c3 100644
+index 4735dfb..0a688ef 100644
 --- a/src/window.py
 +++ b/src/window.py
-@@ -927,8 +927,8 @@ class AlpacaWindow(Adw.ApplicationWindow):
-     def prepare_alpaca(self):
-         self.main_navigation_view.replace_with_tags(['chat'])
-         # Notice
--        if not SQL.get_preference('last_notice_seen') == self.notice_dialog.get_name():
--            self.notice_dialog.present(self)
-+        #if not SQL.get_preference('last_notice_seen') == self.notice_dialog.get_name():
-+        #    self.notice_dialog.present(self)
+@@ -907,7 +907,8 @@ class AlpacaWindow(Adw.ApplicationWindow):
  
-         #Chat History
-         self.load_history()
+         self.prepare_alpaca()
+         if self.settings.get_value('skip-welcome').unpack():
+-            if not self.settings.get_value('last-notice-seen').unpack() == self.notice_dialog.get_name():
+-                self.notice_dialog.present(self)
++            pass
++        #    if not self.settings.get_value('last-notice-seen').unpack() == self.notice_dialog.get_name():
++        #        self.notice_dialog.present(self)
+         else:
+             self.main_navigation_view.replace_with_tags(['welcome'])
