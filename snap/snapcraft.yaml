@@ -106,13 +106,14 @@ parts:
     source-type: git
     source: https://github.com/Jeffser/Alpaca.git
     source-depth: 1
-    source-tag: 7.0.1
+    source-tag: 7.5.0
     meson-parameters:
       - --prefix=/usr
       - -Ddatadir=/snap/alpaca-kenvandine/current/usr/share
     override-pull: |
       craftctl default
-      sed -i 's#Jeffser/Alpaca/wiki#kenvandine/alpaca-snap/wiki#g' $CRAFT_PART_SRC/src/gtk/window.ui
+      sed -i 's#Jeffser/Alpaca/wiki#kenvandine/alpaca-snap/wiki#g' $CRAFT_PART_SRC/src/window.py
+
       patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_no_notice.patch
       patch -p1 < $CRAFT_PROJECT_DIR/patches/alpaca_issue_link.patch
     override-build: |
