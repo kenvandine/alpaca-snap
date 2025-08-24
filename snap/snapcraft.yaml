@@ -106,7 +106,7 @@ parts:
     source-type: git
     source: https://github.com/Jeffser/Alpaca.git
     source-depth: 1
-    source-tag: 7.5.5
+    source-tag: 7.7.5
     meson-parameters:
       - --prefix=/usr
       - -Ddatadir=/snap/alpaca-kenvandine/current/usr/share
